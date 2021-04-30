@@ -4,7 +4,7 @@
  * - WinCompose and Unicode https://docs.qmk.fm/#/feature_unicode?id=methods
  * - Modifiers on home row (lwin, lalt, lctrl, lshift - rshift, rctrl, ralt, rwin)
  *   https://precondition.github.io/home-row-mods
- * - LCTRL et AltGr deviennent MO(SYMFN) avec Fn à la main droite
+ * - LCTRL et AltGr deviennent MO(SYMFN) avec Fn Ã  la main droite
  * - Move to QWERTY
  * - Move to Colemak using Tarmak
  * - Tune layout 
@@ -29,16 +29,9 @@ enum layers {
 #define _M_M_M_ KC_TRNS // A simple KC_TRNS that shows were the layer key is and cannot be used on that layer.
 #define XXXXXXX KC_NO
 
-enum custom_keycodes {
-#ifdef ORYX_CONFIGURATOR
-  VRSN = EZ_SAFE_RANGE,
-#else
-  VRSN = SAFE_RANGE,
-#endif
-  RGB_SLD
-};
-
 enum macro_keycodes {
+  NONE = 0,
+  KC_TEST_MACRO,
   KC_AG_BSLASH,
   KC_AG_SEMIC,
   KC_AG_PERIOD,
@@ -71,14 +64,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 1: Nav and Num Layer */
 [NAVNUM] = LAYOUT_ergodox_pretty(
   // left hand
-  _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F11,      KC_TRNS, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
-  XXXXXXX, KC_GRAVE, KC_HOME, KC_UP,KC_END,KC_PGUP,_______,     KC_TRNS, KC_UP,   KC_7,    KC_8,    KC_9,    KC_ASTR, KC_F12,
-  KC_TRNS, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,               KC_DOWN, KC_4,    KC_5,    KC_6,    KC_PLUS, KC_TRNS,
-  KC_TRNS, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, KC_TRNS,     KC_TRNS, KC_AMPR, KC_1,    KC_2,    KC_3,    KC_BSLS, KC_TRNS,
-  EEP_RST, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                         KC_TRNS, KC_DOT,  KC_0,    KC_EQL,  KC_TRNS,
-                                               RGB_MOD, KC_TRNS,     RGB_TOG, RGB_SLD,
-                                                        KC_TRNS,     KC_TRNS,
-                                      RGB_VAD, RGB_VAI, KC_TRNS,     KC_TRNS, RGB_HUD, RGB_HUI
+  _______,           KC_F1,           KC_F2,            KC_F3,           KC_F4,            KC_F5,                KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,          RESET,
+  M(KC_AG_LBRACKET), KC_GRAVE,        KC_HOME,          KC_UP,           KC_END,           KC_PGUP,              _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        M(KC_AG_PERIOD), M(KC_AG_RBRACKET),
+  M(KC_AG_LPAREN),   SFT_T(KC_ENTER), KC_LEFT,          KC_DOWN,         KC_RIGHT,         KC_PGDOWN,                                     KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), KC_KP_DOT,       M(KC_AG_RPAREN),
+  M(KC_AG_LCURBRK),  M(KC_ALTTAB),    M(KC_CUT_CLOSE),  M(KC_COPY_WBCK), M(KC_PASTE_WFWD), LGUI(LSFT(KC_RIGHT)), _______,        _______, M(KC_AG_SEMIC), KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,  M(KC_AG_RCURBRK),
+  XXXXXXX,           XXXXXXX,         XXXXXXX,          KC_LALT,         KC_LCTL,                                                                         KC_KP_0,        KC_RCTRL,       XXXXXXX,        XXXXXXX,         XXXXXXX,
+                                               RESET,   M(KC_TEST_MACRO),     XXXXXXX, _______,
+                                                        XXXXXXX,     XXXXXXX,
+                                      _M_M_M_, _______, _______,     _______, _______, _______
 ),
 /* Keymap 2: Media and mouse keys */
 [MDIA] = LAYOUT_ergodox_pretty(
@@ -95,28 +88,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 };
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (record->event.pressed) {
-    switch (keycode) {
-      case VRSN:
-        SEND_STRING (QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
-        return false;
-      #ifdef RGBLIGHT_ENABLE
-      case RGB_SLD:
-        rgblight_mode(1);
-        return false;
-      #endif
-    }
-  }
-  return true;
-}
-
 // Runs just one time when the keyboard initializes.
 void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_COLOR_LAYER_0
   rgblight_setrgb(RGBLIGHT_COLOR_LAYER_0);
 #endif
 };
+
+
 
 // Runs whenever there is a layer state change.
 layer_state_t layer_state_set_user(layer_state_t state) {
@@ -191,7 +170,15 @@ static uint16_t key_timer; // Use for tap/long tap mechanism
 // leaving this in place for compatibilty with old keymaps cloned and re-compiled.
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
+      if (!eeconfig_is_enabled()) {
+        eeconfig_init();
+      }
       switch(id) {
+        case KC_TEST_MACRO:
+          if (record->event.pressed) {
+            SEND_STRING("YOUR_STRING_HERE");
+          }
+          break;
         case KC_AG_BSLASH:
           if (record->event.pressed) {
             // SEND_STRING ("\\");

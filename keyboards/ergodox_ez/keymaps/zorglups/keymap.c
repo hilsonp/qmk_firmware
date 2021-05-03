@@ -4,7 +4,7 @@
  * - WinCompose and Unicode https://docs.qmk.fm/#/feature_unicode?id=methods
  * - Modifiers on home row (lwin, lalt, lctrl, lshift - rshift, rctrl, ralt, rwin)
  *   https://precondition.github.io/home-row-mods
- * - LCTRL et AltGr deviennent MO(SYMFN) avec Fn Ã  la main droite
+ * - LCTRL et AltGr deviennent MO(SYMFN) avec Fn a la main droite
  * - Move to QWERTY
  * - Move to Colemak using Tarmak
  * - Tune layout 
@@ -18,6 +18,10 @@
 #include QMK_KEYBOARD_H
 #include "version.h"
 
+#include "sendstring_belgian.h"
+
+// Custom variables
+int alt_tab_count = 0;
 enum layers {
     BASE, // default layer
     NAVNUM, // symbols
@@ -29,62 +33,106 @@ enum layers {
 #define _M_M_M_ KC_TRNS // A simple KC_TRNS that shows were the layer key is and cannot be used on that layer.
 #define XXXXXXX KC_NO
 
-enum macro_keycodes {
-  NONE = 0,
-  KC_TEST_MACRO,
-  KC_AG_BSLASH,
-  KC_AG_SEMIC,
-  KC_AG_PERIOD,
-  KC_AG_LBRACKET,
-  KC_AG_RBRACKET,
-  KC_AG_LPAREN,
-  KC_AG_RPAREN,
-  KC_AG_LCURBRK,
-  KC_AG_RCURBRK,
-  KC_ALTTAB,
-  KC_COPY_WBCK,
-  KC_PASTE_WFWD,
-  KC_CUT_CLOSE,
-  KC_MEDIA_NEXT_PREV
+enum custom_keycodes {
+    ALTTAB = SAFE_RANGE,
+    LBRACKET,
+    RBRACKET,
+    LPARENT,
+    RPARENT,
+    RCBRACKET,
+    LCBRACKET,
+    BCKSLASH,
+    COLON,
+};
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+      case ALTTAB:
+        if (record->event.pressed) {
+          SEND_STRING(SS_DOWN(X_LALT)SS_DOWN(X_TAB));
+          alt_tab_count++;
+        } else {
+          SEND_STRING(SS_UP(X_TAB));
+        }
+        break;
+      case MO(NAVNUM):
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+        } else {
+            // when keycode QMKBEST is released
+            if (alt_tab_count > 0) {
+              SEND_STRING(SS_UP(X_LALT));;
+            }
+        }
+        break;
+      case LBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("[");
+        }
+        break;
+      case RBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("]");
+        }
+        break;
+      case LPARENT:
+        if (record->event.pressed) {
+            SEND_STRING("(");
+        }
+        break;
+      case RPARENT:
+        if (record->event.pressed) {
+            SEND_STRING(")");
+        }
+        break;
+      case LCBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("{");
+        }
+        break;
+      case RCBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("}");
+        }
+        break;
+      case BCKSLASH:
+        if (record->event.pressed) {
+            SEND_STRING("\\");
+        }
+        break;
+      case COLON:
+        if (record->event.pressed) {
+            SEND_STRING(":");
+        }
+        break;
+    }
+    return true;
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 0: Basic layer */
 [BASE] = LAYOUT_ergodox_pretty(
   // left hand
-  KC_ESCAPE,       KC_1,        KC_2,          KC_3,    KC_4,    KC_5,    KC_LBRACKET,          KC_RBRACKET,  KC_6,    KC_7,    KC_8,    KC_9,    KC_0,      KC_MINS,
-  KC_LBRACKET,     KC_Q,        KC_W,          KC_E,    KC_R,    KC_T,    KC_TAB,               KC_BSPACE,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,      KC_EQUAL,
-  KC_ENTER,        KC_A,        KC_S,          KC_D,    KC_F,    KC_G,                                        KC_H,    KC_J,    KC_K,    KC_L,    KC_SCOLON, KC_ENTER,
-  KC_NONUS_BSLASH, KC_Z,        KC_X,          KC_C,    KC_V,    KC_B,    KC_DELETE,            KC_DELETE,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,   KC_QUOTE,
-  XXXXXXX,         XXXXXXX,     XXXXXXX,       KC_LALT, KC_LCTL,                                              KC_RALT, KC_RCTL, XXXXXXX, XXXXXXX, XXXXXXX,
-                                                            KC_PGUP,      KC_PGDOWN,            KC_INSERT,    KC_PSCREEN,
+  KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,    KC_5,    KC_LBRACKET,          KC_RBRACKET,  KC_6,    KC_7,    KC_8,        KC_9,        KC_0,      KC_MINS,
+  KC_LBRACKET,     KC_Q,        KC_W,          KC_E,        KC_R,    KC_T,    KC_TAB,               KC_BSPACE,    KC_Y,    KC_U,    KC_I,        KC_O,        KC_P,      KC_EQUAL,
+  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), KC_F,    KC_G,                                        KC_H,    KC_J,    CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCOLON), KC_ENTER,
+  KC_NONUS_BSLASH, KC_Z,        KC_X,          KC_C,        KC_V,    KC_B,    KC_DELETE,            KC_DELETE,    KC_N,    KC_M,    KC_COMM,     KC_DOT,      KC_SLSH,   KC_QUOTE,
+  XXXXXXX,         XXXXXXX,     XXXXXXX,       KC_LALT,     KC_LCTL,                                              KC_RALT, KC_RCTL, XXXXXXX,     XXXXXXX,     XXXXXXX,
+                                                                KC_PGUP,      KC_PGDOWN,            KC_INSERT,    KC_PSCREEN,
                                                                           XXXXXXX,              XXXXXXX,
-                                            MO(NAVNUM),     KC_LSHIFT,    KC_LGUI,              KC_RGUI,      KC_RSHIFT,   LT(NAVNUM,KC_SPC)
+                                                MO(NAVNUM),     KC_LSHIFT,    KC_LGUI,              KC_RGUI,      KC_RSHIFT,   LT(NAVNUM,KC_SPC)
 ),
 /* Keymap 1: Nav and Num Layer */
 [NAVNUM] = LAYOUT_ergodox_pretty(
   // left hand
-  _______,           KC_F1,           KC_F2,            KC_F3,           KC_F4,            KC_F5,                KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,          RESET,
-  M(KC_AG_LBRACKET), KC_GRAVE,        KC_HOME,          KC_UP,           KC_END,           KC_PGUP,              _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        M(KC_AG_PERIOD), M(KC_AG_RBRACKET),
-  M(KC_AG_LPAREN),   SFT_T(KC_ENTER), KC_LEFT,          KC_DOWN,         KC_RIGHT,         KC_PGDOWN,                                     KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), KC_KP_DOT,       M(KC_AG_RPAREN),
-  M(KC_AG_LCURBRK),  M(KC_ALTTAB),    M(KC_CUT_CLOSE),  M(KC_COPY_WBCK), M(KC_PASTE_WFWD), LGUI(LSFT(KC_RIGHT)), _______,        _______, M(KC_AG_SEMIC), KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,  M(KC_AG_RCURBRK),
-  XXXXXXX,           XXXXXXX,         XXXXXXX,          KC_LALT,         KC_LCTL,                                                                         KC_KP_0,        KC_RCTRL,       XXXXXXX,        XXXXXXX,         XXXXXXX,
-                                               RESET,   M(KC_TEST_MACRO),     XXXXXXX, _______,
-                                                        XXXXXXX,     XXXXXXX,
-                                      _M_M_M_, _______, _______,     _______, _______, _______
-),
-/* Keymap 2: Media and mouse keys */
-[MDIA] = LAYOUT_ergodox_pretty(
-  // left hand
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_MS_U, KC_TRNS, KC_TRNS, KC_TRNS,     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_TRNS,                       KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MPLY,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,     KC_TRNS, KC_TRNS, KC_TRNS, KC_MPRV, KC_MNXT, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_BTN1, KC_BTN2,                                         KC_VOLU, KC_VOLD, KC_MUTE, KC_TRNS, KC_TRNS,
-
-                                               KC_TRNS, KC_TRNS,     KC_TRNS, KC_TRNS,
-                                                        KC_TRNS,     KC_TRNS,
-                                      KC_TRNS, KC_TRNS, KC_TRNS,     KC_TRNS, KC_TRNS, KC_WBAK
+  _______,           KC_F1,           KC_F2,            KC_F3,           KC_F4,            KC_F5,                KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           RESET,
+  LBRACKET,          KC_GRAVE,        KC_HOME,          KC_UP,           KC_END,           KC_PGUP,              _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        BCKSLASH,         RBRACKET,
+  LPARENT,           SFT_T(KC_ENTER), KC_LEFT,          KC_DOWN,         KC_RIGHT,         KC_PGDOWN,                                     KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), GUI_T(KC_KP_DOT), RPARENT,
+  LCBRACKET,         ALTTAB,          LCTL(KC_X),       LCTL(KC_C),      LCTL(KC_V),       LGUI(LSFT(KC_RIGHT)), _______,        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,   RCBRACKET,
+  XXXXXXX,           XXXXXXX,         XXXXXXX,          KC_LALT,         KC_LCTL,                                                                         KC_KP_0,        KC_RCTRL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
+                                               RESET,   XXXXXXX,         XXXXXXX, _______,
+                                                        XXXXXXX,         XXXXXXX,
+                                      _M_M_M_, _______, _______,         _______, _______, _______
 ),
 };
 
@@ -95,14 +143,12 @@ void keyboard_post_init_user(void) {
 #endif
 };
 
-
-
 // Runs whenever there is a layer state change.
 layer_state_t layer_state_set_user(layer_state_t state) {
   ergodox_board_led_off();
   ergodox_right_led_1_off();
   ergodox_right_led_2_off();
-  ergodox_right_led_3_off();
+  ergodox_right_led_3_on();
 
   uint8_t layer = get_highest_layer(state);
   switch (layer) {
@@ -124,7 +170,6 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         #endif
         break;
       case 3:
-        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_3
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_3);
         #endif
@@ -163,136 +208,4 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     }
 
   return state;
-};
-
-// TODO: Replace this by proper Unicode handling
-static uint16_t key_timer; // Use for tap/long tap mechanism
-// leaving this in place for compatibilty with old keymaps cloned and re-compiled.
-const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
-{
-      if (!eeconfig_is_enabled()) {
-        eeconfig_init();
-      }
-      switch(id) {
-        case KC_TEST_MACRO:
-          if (record->event.pressed) {
-            SEND_STRING("YOUR_STRING_HERE");
-          }
-          break;
-        case KC_AG_BSLASH:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_9), T(KP_2),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_SEMIC:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_5), T(KP_8),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_PERIOD:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_4), T(KP_4),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_LPAREN:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_4), T(KP_0),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_RPAREN:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_4), T(KP_1),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_LBRACKET:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_9), T(KP_1),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_RBRACKET:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_9), T(KP_3),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_LCURBRK:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_1), T(KP_2), T(KP_3),  U(LALT), END  );
-          }
-          break;
-        case KC_AG_RCURBRK:
-          if (record->event.pressed) {
-            // SEND_STRING ("\\");
-            return MACRO( D(LALT), T(KP_1), T(KP_2),  T(KP_5), U(LALT), END  );
-          }
-          break;
-        case KC_ALTTAB:
-          if (record->event.pressed) {
-            return MACRO( D(LALT), D(TAB), END  );
-          }
-          else {
-            return MACRO( U(TAB), END  );
-          }
-          break;
-        case KC_COPY_WBCK:
-          if (record->event.pressed) {
-            key_timer = timer_read(); // if the key is being pressed, we start the timer.
-          }
-          else { // this means the key was just released, so we can figure out how long it was pressed for (tap or "held down").
-            if (timer_elapsed(key_timer) < 500) { // the number being the threshhold (in ms) we pick for counting something as a tap.
-              return MACRO( D(LCTL), T(C), U(LCTL), END  );
-            }
-            else {
-              return MACRO( T(WWW_BACK), END  );
-            }
-          }
-          break;
-        case KC_PASTE_WFWD:
-          if (record->event.pressed) {
-            key_timer = timer_read(); // if the key is being pressed, we start the timer.
-          }
-          else { // this means the key was just released, so we can figure out how long it was pressed for (tap or "held down").
-            if (timer_elapsed(key_timer) < 500) { // the number being the threshhold (in ms) we pick for counting something as a tap.
-              return MACRO( D(LCTL), T(V), U(LCTL), END  );
-            }
-            else {
-              return MACRO( T(WWW_FORWARD), END  );
-            }
-          }
-          break;
-        case KC_CUT_CLOSE:
-          if (record->event.pressed) {
-            key_timer = timer_read(); // if the key is being pressed, we start the timer.
-          }
-          else { // this means the key was just released, so we can figure out how long it was pressed for (tap or "held down").
-            if (timer_elapsed(key_timer) < 500) { // the number being the threshhold (in ms) we pick for counting something as a tap.
-              return MACRO( D(LCTL), T(X), U(LCTL), END  );
-            }
-            else {
-              return MACRO( D(LALT), T(F4), U(LALT), END  );
-            }
-          }
-          break;
-        case KC_MEDIA_NEXT_PREV:
-          if (record->event.pressed) {
-            key_timer = timer_read(); // if the key is being pressed, we start the timer.
-          }
-          else { // this means the key was just released, so we can figure out how long it was pressed for (tap or "held down").
-            if (timer_elapsed(key_timer) < 500) { // the number being the threshhold (in ms) we pick for counting something as a tap.
-              return MACRO( T(MEDIA_NEXT_TRACK), END  );
-            }
-            else {
-              return MACRO( T(MEDIA_NEXT_TRACK), END  );
-            }
-          }
-          break;        
-      }
-    return MACRO_NONE;
 };

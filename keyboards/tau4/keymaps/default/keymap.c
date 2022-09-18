@@ -52,7 +52,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MSTP, KC_MPRV, KC_MPLY, KC_MNXT),
 
     [_ADJUST] = LAYOUT_ortho_4x12(
-        KC_TRNS, RGB_TOG,     RGB_MOD, RGB_HUD, RGB_HUI,  RGB_SAD,  RGB_SAI, RGB_VAD, RGB_VAI, KC_TRNS, KC_TRNS, RESET,
+        KC_TRNS, RGB_TOG,     RGB_MOD, RGB_HUD, RGB_HUI,  RGB_SAD,  RGB_SAI, RGB_VAD, RGB_VAI, KC_TRNS, KC_TRNS, QK_BOOT,
         KC_TRNS, RGB_M_P,     RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_K, RGB_M_X, RGB_M_G, RGB_M_T, KC_TRNS, KC_TRNS,
         KC_TRNS, TG(_NUMPAD), KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
         KC_TRNS, KC_TRNS,     KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
@@ -101,7 +101,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
-void encoder_update_user(uint8_t index, bool clockwise) {
+bool encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) { /* First encoder */
         if (clockwise) {
             tap_code(KC_VOLU);
@@ -109,10 +109,11 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             tap_code(KC_VOLD);
         }
     }
+    return true;
 }
 
 
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
 
 static void render_status(void) {
     oled_write_P(PSTR("Tau.4 v1.0\n\n"), false);
@@ -139,7 +140,8 @@ static void render_status(void) {
     }
 }
 
-void oled_task_user(void) {
+bool oled_task_user(void) {
     render_status();
+    return false;
 }
 #endif

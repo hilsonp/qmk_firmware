@@ -1,19 +1,22 @@
 /* TASKS
  * - Compile and test current layout
- * - 
+ * -
  * - WinCompose and Unicode https://docs.qmk.fm/#/feature_unicode?id=methods
  * - Modifiers on home row (lwin, lalt, lctrl, lshift - rshift, rctrl, ralt, rwin)
  *   https://precondition.github.io/home-row-mods
  * - LCTRL et AltGr deviennent MO(SYMFN) avec Fn a la main droite
  * - Move to QWERTY
  * - Move to Colemak using Tarmak
- * - Tune layout 
+ * - Tune layout
  *   - https://github.com/precondition/dactyl-manuform-keymap
  * - Pimoroni trackball https://github.com/drashna/qmk_firmware/blob/drashna_keymaps/users/drashna/pimoroni_trackball.c
  *                      https://www.reddit.com/r/Trackballs/comments/gtm36a/its_not_large_but_its_mine/
- * 
- * 
- */ 
+ *
+ *
+ * History
+ * 2023-11-04 Added Shift home mod
+ *
+ */
 
 #include QMK_KEYBOARD_H
 #include "version.h"
@@ -29,7 +32,7 @@ enum layers {
 };
 
 // Fillers to make layering more clear
-#define _______ KC_TRNS
+// #define _______ KC_TRNS
 #define _M_M_M_ KC_TRNS // A simple KC_TRNS that shows were the layer key is and cannot be used on that layer.
 #define XXXXXXX KC_NO
 
@@ -115,7 +118,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // left hand
   KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,    KC_5,    KC_LBRACKET,          KC_RBRACKET,  KC_6,    KC_7,    KC_8,        KC_9,        KC_0,      KC_MINS,
   KC_LBRACKET,     KC_Q,        KC_W,          KC_E,        KC_R,    KC_T,    KC_TAB,               KC_BSPACE,    KC_Y,    KC_U,    KC_I,        KC_O,        KC_P,      KC_EQUAL,
-  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), KC_F,    KC_G,                                        KC_H,    KC_J,    CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCOLON), KC_ENTER,
+  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                    KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCOLON), KC_ENTER,
   KC_NONUS_BSLASH, KC_Z,        KC_X,          KC_C,        KC_V,    KC_B,    KC_DELETE,            KC_DELETE,    KC_N,    KC_M,    KC_COMM,     KC_DOT,      KC_SLSH,   KC_QUOTE,
   XXXXXXX,         XXXXXXX,     XXXXXXX,       KC_LALT,     KC_LCTL,                                              KC_RALT, KC_RCTL, XXXXXXX,     XXXXXXX,     XXXXXXX,
                                                                 KC_PGUP,      KC_PGDOWN,            KC_INSERT,    KC_PSCREEN,
@@ -135,6 +138,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                       _M_M_M_, _______, _______,         _______, _______, _______
 ),
 };
+
 
 // Runs just one time when the keyboard initializes.
 void keyboard_post_init_user(void) {

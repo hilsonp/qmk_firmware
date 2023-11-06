@@ -157,24 +157,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 0: Basic layer */
 [BASE] = LAYOUT_ergodox_pretty(
   // left hand
-  KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      KC_LBRACKET,          KC_RBRACKET,  KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
-  KC_LBRACKET,     KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPACE,    KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
-  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCOLON), KC_ENTER,
-  KC_NONUS_BSLASH, KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
-  XXXXXXX,         XXXXXXX,     XXXXXXX,       XXXXXXX,     FNX,                                                              KC_RALT,     XXXXXXX,     XXXXXXX,     XXXXXXX,          XXXXXXX,
+  KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      LBRACKET,             RBRACKET,     KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
+  LBRACKET,        KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPC,      KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
+  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCLN), KC_ENTER,
+  KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
+  XXXXXXX,         XXXXXXX,     XXXXXXX,       XXXXXXX,     FNX,                                                                 KC_RALT,     XXXXXXX,     XXXXXXX,     XXXXXXX,          XXXXXXX,
                                                                          XXXXXXX,   XXXXXXX,              XXXXXXX,      XXXXXXX,
                                                                                     XXXXXXX,              XXXXXXX,
-                                                             MO(NAVNUM), KC_LSHIFT, XXXXXXX,              XXXXXXX,      KC_RSHIFT,   KC_SPC
+                                                               MO(NAVNUM), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
 ),
 /* Keymap 1: Nav and Num Layer */
 [NAVNUM] = LAYOUT_ergodox_pretty(
   // left hand
-  _______,   KC_F1,           KC_F2,   KC_F3,   KC_F4,      KC_F5,         KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           RESET,
+  _______,   KC_F1,           KC_F2,   KC_F3,   KC_F4,      KC_F5,         KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           QK_BOOT,
   LBRACKET,  KC_GRAVE,        KC_HOME, KC_UP,   KC_END,     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        BCKSLASH,         RBRACKET,
-  LPARENT,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDOWN,                              KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), GUI_T(KC_KP_DOT), RPARENT,
+  LPARENT,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), GUI_T(KC_KP_DOT), RPARENT,
   LCBRACKET, ALTTAB,          CTL_X,   CTL_C,   CTL_V,      WIN_SHFT_RGHT, _______,        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,   RCBRACKET,
-  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTRL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
-                                                            RESET,         XXXXXXX,        XXXXXXX, XXXXXXX,
+  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
+                                                            QK_BOOT,         XXXXXXX,        XXXXXXX, XXXXXXX,
                                                                            XXXXXXX,        XXXXXXX,
                                                    _M_M_M_, XXXXXXX,       XXXXXXX,        XXXXXXX, XXXXXXX, _______
 ),
@@ -182,11 +182,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [FN] = LAYOUT_ergodox_pretty(
   // left hand
   _______,           XXXXXXX,           KC_F10,          KC_F11,           KC_F12,          XXXXXXX,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_NUHS,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-  XXXXXXX,           XXXXXXX,           KC_F7,           KC_F8,            KC_F9,           KC_PSCREEN,       _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-  XXXXXXX,           XXXXXXX,           KC_F4,           KC_F5,            KC_F6,           KC_INSERT,                                 XXXXXXX,        KC_LSHIFT,      KC_LCTRL,       KC_LALT,        KC_LGUI,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F7,           KC_F8,            KC_F9,           KC_PSCR,       _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F4,           KC_F5,            KC_F6,           KC_INSERT,                                 XXXXXXX,        KC_LSFT,        KC_LCTL,       KC_LALT,        KC_LGUI,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           KC_F1,           KC_F2,            KC_F3,           XXXXXXX,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          _M_M_M_,                                                                    XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-                                                                                            RESET,            XXXXXXX,        XXXXXXX, _______,
+                                                                                            QK_BOOT,            XXXXXXX,        XXXXXXX, _______,
                                                                                                               XXXXXXX,        XXXXXXX,
                                                                                    XXXXXXX, _______,          _______,        _______, _______, _______
 ),

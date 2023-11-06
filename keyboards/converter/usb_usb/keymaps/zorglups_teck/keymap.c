@@ -16,13 +16,105 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#include "version.h"
+
+#include "sendstring_belgian.h"
+
+// Custom variables
+int alt_tab_count = 0;
+enum layers {
+    BASE, // default layer
+    NAVNUM, // navigation and numeric keypad
+    FN,     // Fn keys
+    MDIA,  // media keys
+};
 
 // Fillers to make layering more clear
 //#define _______ KC_TRNS
 #define _M_M_M_ KC_TRNS // A simple KC_TRNS that shows were the layer key is and cannot be used on that layer.
 #define XXXXXXX KC_NO
+#define CTL_X LCTL(KC_X)
+#define CTL_C LCTL(KC_C)
+#define CTL_V LCTL(KC_V)
+#define WIN_SHFT_RGHT LGUI(LSFT(KC_RIGHT))
 
-/* 
+enum custom_keycodes {
+    ALTTAB = SAFE_RANGE,
+    LBRACKET,
+    RBRACKET,
+    LPARENT,
+    RPARENT,
+    RCBRACKET,
+    LCBRACKET,
+    BCKSLASH,
+    COLON,
+};
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+      case ALTTAB:
+        if (record->event.pressed) {
+          SEND_STRING(SS_DOWN(X_LALT)SS_DOWN(X_TAB));
+          alt_tab_count++;
+        } else {
+          SEND_STRING(SS_UP(X_TAB));
+        }
+        break;
+      case MO(NAVNUM):
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+        } else {
+            // when keycode QMKBEST is released
+            if (alt_tab_count > 0) {
+              SEND_STRING(SS_UP(X_LALT));;
+            }
+        }
+        break;
+      case LBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("[");
+        }
+        break;
+      case RBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("]");
+        }
+        break;
+      case LPARENT:
+        if (record->event.pressed) {
+            SEND_STRING("(");
+        }
+        break;
+      case RPARENT:
+        if (record->event.pressed) {
+            SEND_STRING(")");
+        }
+        break;
+      case LCBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("{");
+        }
+        break;
+      case RCBRACKET:
+        if (record->event.pressed) {
+            SEND_STRING("}");
+        }
+        break;
+      case BCKSLASH:
+        if (record->event.pressed) {
+            SEND_STRING("\\");
+        }
+        break;
+      case COLON:
+        if (record->event.pressed) {
+            SEND_STRING(":");
+        }
+        break;
+    }
+    return true;
+};
+
+/*
  * This mapping is a bit weird.
  * The first asciiart shows the virtual keyboard emulated by the usb_usb converter
  * The second asciiart shows the keys sent by the TECK (using the custom firmware)
@@ -69,6 +161,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *    |   |   |   |PgD|   |   |   |      |   |   |   | K-|   |   |   |
      *    |--------------------------------------------------------------|
      *
+     * BASE :
+     * - K7 => KC_ESCAPE
+     * -
+     *
      */
 //  [0] = LAYOUT_all(
 //                    KC_F13,  KC_F14,  KC_F15,  KC_F16, KC_F17, KC_F18, KC_F19,  KC_F20,  KC_F21,  KC_F22,  KC_F23,  KC_F24,
@@ -79,7 +175,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //  KC_LSFT, KC_NUBS, KC_Z,    KC_X,    KC_C,    KC_V,   KC_B,   KC_N,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH,          KC_RO,   KC_RSFT,              KC_UP,               KC_P1,   KC_P2,   KC_P3,   KC_PEQL,    KC_EXEC, KC_PSTE,
 //  KC_LCTL, KC_LGUI, KC_LALT, KC_MHEN, KC_HANJ,         KC_SPC,         KC_HAEN, KC_HENK, KC_KANA, KC_RALT, KC_RGUI, KC_APP,  KC_RCTL,     KC_LEFT, KC_DOWN, KC_RGHT,    KC_P0,            KC_PDOT, KC_PENT,    KC_FIND, KC_CUT
 //  ),
-        [0] = LAYOUT_all(
+        [BASE] = LAYOUT_all(
                         _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______,
     _______,            _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______,              _______,_______,_______,    _______,_______,_______,_______,    _______,
     _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______, _______,     _______,_______,_______,    _______,_______,_______,_______,    _______,_______,
@@ -88,7 +184,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______,          _______, _______,             _______,            _______,_______,_______,_______,    _______,_______,
     _______,  _______,  _______,  _______,  _______,          _______,            _______, _______,  _______, _______, _______, _______, _______,     _______,_______,_______,    _______,        _______,_______,    _______,_______
     ),
-    [1] = LAYOUT_all(
+    [NAVNUM] = LAYOUT_all(
+                        _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______,
+    _______,            _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______,              _______,_______,_______,    _______,_______,_______,_______,    _______,
+    _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______, _______,     _______,_______,_______,    _______,_______,_______,_______,    _______,_______,
+    _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______,          _______,     _______,_______,_______,    _______,_______,_______,_______,    _______,_______,
+    _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______,          _______, _______,                                 _______,_______,_______,_______,    _______,_______,
+    _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______,          _______, _______,             _______,            _______,_______,_______,_______,    _______,_______,
+    _______,  _______,  _______,  _______,  _______,          _______,            _______, _______,  _______, _______, _______, _______, _______,     _______,_______,_______,    _______,        _______,_______,    _______,_______
+    ),
+    [FN] = LAYOUT_all(
                         _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______,
     _______,            _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______,              _______,_______,_______,    _______,_______,_______,_______,    _______,
     _______,  _______,  _______,  _______,  _______, _______, _______,  _______,  _______, _______,  _______, _______, _______, _______, _______,     _______,_______,_______,    _______,_______,_______,_______,    _______,_______,

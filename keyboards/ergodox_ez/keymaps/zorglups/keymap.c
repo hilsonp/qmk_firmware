@@ -30,6 +30,7 @@ enum layers {
     NAVNUM, // navigation and numeric keypad
     FN,     // Fn keys
     MDIA,  // media keys
+    ALTGRFN, // AltGr and Fn
 };
 
 // Fillers to make layering more clear
@@ -56,7 +57,9 @@ enum custom_keycodes {
     LCBRACKET,
     BCKSLASH,
     COLON,
-    FNX
+    FNX,
+    GRV,
+    TILDE,
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -149,6 +152,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             SEND_STRING(":");
         }
         break;
+      case GRV:
+        if (record->event.pressed) {
+            SEND_STRING("`");
+        }
+        break;
+      case TILDE:
+        if (record->event.pressed) {
+            SEND_STRING("~ ");
+        }
+        break;
     }
     return true;
 };
@@ -157,11 +170,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 0: Basic layer */
 [BASE] = LAYOUT_ergodox_pretty(
   // left hand
-  KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      LBRACKET,             RBRACKET,     KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
-  LBRACKET,        KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPC,      KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
-  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCLN), KC_ENTER,
+  KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      KC_QUOTE,             KC_RBRC,      KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
+  KC_LBRC,         KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPC,      KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
+  KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCLN),   KC_ENTER,
   KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
-  XXXXXXX,         XXXXXXX,     XXXXXXX,       XXXXXXX,     FNX,                                                                 KC_RALT,     XXXXXXX,     XXXXXXX,     XXXXXXX,          XXXXXXX,
+  XXXXXXX,         XXXXXXX,     XXXXXXX,       XXXXXXX,     KC_LCTL,                                                             MO(ALTGRFN), XXXXXXX,     XXXXXXX,     XXXXXXX,          XXXXXXX,
                                                                          XXXXXXX,   XXXXXXX,              XXXXXXX,      XXXXXXX,
                                                                                     XXXXXXX,              XXXXXXX,
                                                                MO(NAVNUM), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
@@ -175,21 +188,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   LCBRACKET, ALTTAB,          CTL_X,   CTL_C,   CTL_V,      WIN_SHFT_RGHT, _______,        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,   RCBRACKET,
   XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
                                                             QK_BOOT,         XXXXXXX,        XXXXXXX, XXXXXXX,
-                                                                           XXXXXXX,        XXXXXXX,
-                                                   _M_M_M_, XXXXXXX,       XXXXXXX,        XXXXXXX, XXXXXXX, _______
+                                                                             XXXXXXX,        XXXXXXX,
+                                                     _M_M_M_, QK_BOOT,       XXXXXXX,        XXXXXXX, XXXXXXX, _______
 ),
 /* Keymap 2: Fn Layer */
 [FN] = LAYOUT_ergodox_pretty(
   // left hand
   _______,           XXXXXXX,           KC_F10,          KC_F11,           KC_F12,          XXXXXXX,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_NUHS,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-  XXXXXXX,           XXXXXXX,           KC_F7,           KC_F8,            KC_F9,           KC_PSCR,       _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-  XXXXXXX,           XXXXXXX,           KC_F4,           KC_F5,            KC_F6,           KC_INSERT,                                 XXXXXXX,        KC_LSFT,        KC_LCTL,       KC_LALT,        KC_LGUI,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F7,           KC_F8,            KC_F9,           KC_PSCR,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F4,           KC_F5,            KC_F6,           KC_INSERT,                                 XXXXXXX,        KC_LSFT,        KC_LCTL,        KC_LALT,        KC_LGUI,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           KC_F1,           KC_F2,            KC_F3,           XXXXXXX,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          _M_M_M_,                                                                    XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
                                                                                             QK_BOOT,            XXXXXXX,        XXXXXXX, _______,
                                                                                                               XXXXXXX,        XXXXXXX,
                                                                                    XXXXXXX, _______,          _______,        _______, _______, _______
 ),
+
+[ALTGRFN] = LAYOUT_ergodox_pretty(
+  // left hand
+  _______,           BE_PIPE,           BE_AT,           BE_HASH,          GRV,             TILDE,            XXXXXXX,        XXXXXXX, XXXXXXX,        KC_F10,         KC_F11,         KC_F12,         XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           XXXXXXX,         BE_EURO,          XXXXXXX,         XXXXXXX,          _______,        _______, KC_PSCR,        KC_F7,          KC_F8,          KC_F9,          XXXXXXX,          XXXXXXX,
+  _______,           KC_LGUI,           KC_LALT,         KC_LCTL,          KC_LSFT,         XXXXXXX,                                   KC_INSERT,      KC_F4,          KC_F5,          KC_F6,          XXXXXXX,          _______,
+  BE_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,                                                                    _M_M_M_,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
+                                                                                            QK_BOOT,          XXXXXXX,        XXXXXXX, _______,
+                                                                                                              XXXXXXX,        XXXXXXX,
+                                                                                   XXXXXXX, _______,          _______,        _______, QK_BOOT, _______
+),
+
 };
 
 // Runs just one time when the keyboard initializes.

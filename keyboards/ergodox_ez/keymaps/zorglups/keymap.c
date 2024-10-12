@@ -22,15 +22,22 @@
 #include "version.h"
 
 #include "sendstring_belgian.h"
+//#include "keymap_french_mac_iso.h"
+#include "keymap_french_mac_iso.h"
+#include "os_detection.h"
 
 // Custom variables
 int alt_tab_count = 0;
+int cmd_tab_count = 0;
 enum layers {
-    BASE, // default layer
-    NAVNUM, // navigation and numeric keypad
-    FN,     // Fn keys
-    MDIA,  // media keys
-    ALTGRFN, // AltGr and Fn
+    BASE_WIN, // default layer
+    NAVNUM_WIN, // navigation and numeric keypad
+    FN_WIN,     // Fn keys
+    ALTGRFN_WIN, // AltGr and Fn
+    BASE_MAC,
+    NAVNUM_MAC,
+    FN_MAC,
+    ALTGRFN_MAC,
 };
 
 // Fillers to make layering more clear
@@ -40,15 +47,25 @@ enum layers {
 #define CTL_X LCTL(KC_X)
 #define CTL_C LCTL(KC_C)
 #define CTL_V LCTL(KC_V)
+#define CMD_X LCMD(KC_X)
+#define CMD_C LCMD(KC_C)
+#define CMD_V LCMD(KC_V)
 #define WIN_SHFT_RGHT LGUI(LSFT(KC_RIGHT))
+// https://github.com/qmk/qmk_firmware/blob/master/quantum/keymap_extras/keymap_french_mac_iso.h
+#define MAC_FR_AT KC_GRV
+#define MAC_FR_HASH LSFT(MAC_FR_AT)
+#define MAC_FR_PIPE S(A(KC_L))
+#define MAC_FR_BSLS S(A(KC_DOT))
+#define MACCY LCMD(KC_GRV)
 
 // one-mod settings
 //#define ONESHOT_TAP_TOGGLE 5  /* Tapping this number of times holds the key until tapped once again. */
 #define ONESHOT_TIMEOUT 2000  /* Time (in ms) before the one shot key is released */
-
+#define TAPPING_TERM 200 // 200ms example
 
 enum custom_keycodes {
-    ALTTAB = SAFE_RANGE,
+    ALTTAB = SAFE_RANGE, // SAFE_RANGE is only needed on the first entry : https://github.com/qmk/qmk_firmware/blob/master/docs/custom_quantum_functions.md
+    CMDTAB,
     LBRACKET,
     RBRACKET,
     LPARENT,
@@ -69,9 +86,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       case FNX:
         if(record->event.pressed){
           fnx_layer_timer = timer_read();
-          layer_on(FN);
+          layer_on(FN_WIN);
         } else {
-          layer_off(FN);
+          layer_off(FN_WIN);
           if (timer_elapsed(fnx_layer_timer) < 200) {
             set_oneshot_mods(MOD_LCTL);
           }
@@ -102,13 +119,31 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           SEND_STRING(SS_UP(X_TAB));
         }
         break;
-      case MO(NAVNUM):
+      case MO(NAVNUM_WIN):
         if (record->event.pressed) {
             // when keycode QMKBEST is pressed
         } else {
             // when keycode QMKBEST is released
             if (alt_tab_count > 0) {
               SEND_STRING(SS_UP(X_LALT));;
+            }
+        }
+        break;
+      case CMDTAB:
+        if (record->event.pressed) {
+          SEND_STRING(SS_DOWN(X_LCMD)SS_DOWN(X_TAB));
+          cmd_tab_count++;
+        } else {
+          SEND_STRING(SS_UP(X_TAB));
+        }
+        break;
+      case MO(NAVNUM_MAC):
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+        } else {
+            // when keycode QMKBEST is released
+            if (cmd_tab_count > 0) {
+              SEND_STRING(SS_UP(X_LCMD));;
             }
         }
         break;
@@ -166,52 +201,109 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 };
 
+/* -------------------------------------- */
+/*                WINDOWS                 */
+/* ---------------------------------------*/
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-/* Keymap 0: Basic layer */
-[BASE] = LAYOUT_ergodox_pretty(
+/* Keymap 0: Basic Windows layer */
+[BASE_WIN] = LAYOUT_ergodox_pretty(
   // left hand
   KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      KC_QUOTE,             KC_RBRC,      KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
   KC_LBRC,         KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPC,      KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
   KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCLN),   KC_ENTER,
   KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
-  XXXXXXX,         XXXXXXX,     XXXXXXX,       XXXXXXX,     KC_LCTL,                                                             MO(ALTGRFN), XXXXXXX,     XXXXXXX,     XXXXXXX,          XXXXXXX,
-                                                                         XXXXXXX,   XXXXXXX,              XXXXXXX,      XXXXXXX,
+  XXXXXXX,         XXXXXXX,     KC_LWIN,       KC_LALT,     KC_LCTL,                                                             MO(ALTGRFN_WIN), XXXXXXX, KC_RWIN,     XXXXXXX,          XXXXXXX,
+                                                                         XXXXXXX,   XXXXXXX,              KC_KP_0,         XXXXXXX,
                                                                                     XXXXXXX,              XXXXXXX,
-                                                               MO(NAVNUM), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
+                                                               MO(NAVNUM_WIN), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
 ),
-/* Keymap 1: Nav and Num Layer */
-[NAVNUM] = LAYOUT_ergodox_pretty(
+/* Keymap 1: Nav and Num Windows Layer */
+[NAVNUM_WIN] = LAYOUT_ergodox_pretty(
   // left hand
   _______,   KC_F1,           KC_F2,   KC_F3,   KC_F4,      KC_F5,         KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           QK_BOOT,
   LBRACKET,  KC_GRAVE,        KC_HOME, KC_UP,   KC_END,     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        BCKSLASH,         RBRACKET,
   LPARENT,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), GUI_T(KC_KP_DOT), RPARENT,
   LCBRACKET, ALTTAB,          CTL_X,   CTL_C,   CTL_V,      WIN_SHFT_RGHT, _______,        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,   RCBRACKET,
   XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
-                                                            QK_BOOT,         XXXXXXX,        XXXXXXX, XXXXXXX,
+                                                            QK_BOOT,         XXXXXXX,        KC_KP_1,   XXXXXXX,
                                                                              XXXXXXX,        XXXXXXX,
-                                                     _M_M_M_, QK_BOOT,       XXXXXXX,        XXXXXXX, XXXXXXX, _______
+                                                     _M_M_M_, DF(BASE_MAC),       XXXXXXX,        XXXXXXX, XXXXXXX, _______
 ),
-/* Keymap 2: Fn Layer */
-[FN] = LAYOUT_ergodox_pretty(
+/* Keymap 2: Fn Windows Layer */
+[FN_WIN] = LAYOUT_ergodox_pretty(
   // left hand
   _______,           XXXXXXX,           KC_F10,          KC_F11,           KC_F12,          XXXXXXX,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_NUHS,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           KC_F7,           KC_F8,            KC_F9,           KC_PSCR,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           KC_F4,           KC_F5,            KC_F6,           KC_INSERT,                                 XXXXXXX,        KC_LSFT,        KC_LCTL,        KC_LALT,        KC_LGUI,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           KC_F1,           KC_F2,            KC_F3,           XXXXXXX,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          _M_M_M_,                                                                    XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-                                                                                            QK_BOOT,            XXXXXXX,        XXXXXXX, _______,
+                                                                                            QK_BOOT,            XXXXXXX,        KC_KP_2,   _______,
                                                                                                               XXXXXXX,        XXXXXXX,
                                                                                    XXXXXXX, _______,          _______,        _______, _______, _______
 ),
-
-[ALTGRFN] = LAYOUT_ergodox_pretty(
+/* Keymap 3: AltGrFn Windows Layer */
+[ALTGRFN_WIN] = LAYOUT_ergodox_pretty(
   // left hand
   _______,           BE_PIPE,           BE_AT,           BE_HASH,          GRV,             TILDE,            XXXXXXX,        XXXXXXX, XXXXXXX,        KC_F10,         KC_F11,         KC_F12,         XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         BE_EURO,          XXXXXXX,         XXXXXXX,          _______,        _______, KC_PSCR,        KC_F7,          KC_F8,          KC_F9,          XXXXXXX,          XXXXXXX,
   _______,           KC_LGUI,           KC_LALT,         KC_LCTL,          KC_LSFT,         XXXXXXX,                                   KC_INSERT,      KC_F4,          KC_F5,          KC_F6,          XXXXXXX,          _______,
   BE_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,                                                                    _M_M_M_,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
-                                                                                            QK_BOOT,          XXXXXXX,        XXXXXXX, _______,
+                                                                                            QK_BOOT,          XXXXXXX,        KC_KP_3,    _______,
+                                                                                                              XXXXXXX,        XXXXXXX,
+                                                                                   XXXXXXX, _______,          _______,        _______, QK_BOOT, _______
+),
+
+/* -------------------------------------- */
+/*                MAC OS                  */
+/* ---------------------------------------*/
+
+/* Keymap 4: Basic Mac layer */
+[BASE_MAC] = LAYOUT_ergodox_pretty(
+  // left hand
+  KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      KC_QUOTE,             KC_RBRC,      KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
+  KC_LBRC,         KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPC,      KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
+  KC_ENTER,        CTL_T(KC_A), ALT_T(KC_S),   CMD_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CMD_T(KC_K), ALT_T(KC_L), CTL_T(KC_SCLN),   KC_ENTER,
+  KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
+  XXXXXXX,         XXXXXXX,     KC_LCTL,       KC_LOPT,     KC_LCMD,                                                                  MO(ALTGRFN_MAC),        XXXXXXX,XXXXXXX,  XXXXXXX,       XXXXXXX,
+                                                                         XXXXXXX,   XXXXXXX,              KC_KP_4,         XXXXXXX,
+                                                                                    XXXXXXX,              XXXXXXX,
+                                                               MO(NAVNUM_MAC), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
+),
+/* Keymap 5: Nav and Num Mac Layer */
+[NAVNUM_MAC] = LAYOUT_ergodox_pretty(
+  // left hand
+  _______,   KC_F1,           KC_F2,   KC_F3,   KC_F4,      KC_F5,         KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           QK_BOOT,
+  FR_LBRC,   MACCY,           G(KC_LEFT), KC_UP,   G(KC_RIGHT),     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        BCKSLASH,         FR_RBRC,
+  FR_LPRN,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                     KC_KP_MINUS,SFT_T(KC_KP_4), CMD_T(KC_KP_5), OPT_T(KC_KP_6), CTL_T(KC_KP_DOT), FR_RPRN,
+  FR_LCBR,   CMDTAB,          CMD_X,   CMD_C,   CMD_V,      C(A(KC_K)),    C(A(KC_X)),        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,    FR_RCBR,
+  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
+                                                            QK_BOOT,         XXXXXXX,        KC_KP_5,    XXXXXXX,
+                                                                             XXXXXXX,        XXXXXXX,
+                                                     _M_M_M_, DF(BASE_WIN),       XXXXXXX,        XXXXXXX, XXXXXXX, _______
+),
+/* Keymap 6: Fn Mac Layer */
+[FN_MAC] = LAYOUT_ergodox_pretty(
+  // left hand
+  _______,           XXXXXXX,           KC_F10,          KC_F11,           KC_F12,          XXXXXXX,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_NUHS,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F7,           KC_F8,            KC_F9,           KC_PSCR,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F4,           KC_F5,            KC_F6,           KC_INSERT,                                         XXXXXXX,        KC_LSFT,        KC_LCMD,    KC_LALT,    KC_LCTL,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           KC_F1,           KC_F2,            KC_F3,           XXXXXXX,          _______,        _______, XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          _M_M_M_,                                                                                    XXXXXXX,        XXXXXXX,        XXXXXXX,XXXXXXX,      XXXXXXX,
+                                                                                            QK_BOOT,          XXXXXXX,        KC_KP_6,    _______,
+                                                                                                              XXXXXXX,        XXXXXXX,
+                                                                                   XXXXXXX, _______,          _______,        _______, _______, _______
+),
+/* Keymap 7: AltGrFn Mac Layer */
+[ALTGRFN_MAC] = LAYOUT_ergodox_pretty(
+  // left hand
+  _______,           FR_PIPE,           FR_AT,           FR_HASH,          XXXXXXX,         XXXXXXX,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_F10,         KC_F11,         KC_F12,         XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           XXXXXXX,         BE_EURO,          XXXXXXX,         XXXXXXX,          _______,        _______, KC_PSCR,        KC_F7,          KC_F8,          KC_F9,          XXXXXXX,          XXXXXXX,
+  _______,           KC_LCTL,           KC_LALT,         KC_LCMD,          KC_LSFT,         XXXXXXX,                                           KC_INSERT,      KC_F4,          KC_F5,      KC_F6,      XXXXXXX,          _______,
+  FR_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,                                                                                    _M_M_M_,        XXXXXXX,    XXXXXXX,    XXXXXXX,      XXXXXXX,
+                                                                                            QK_BOOT,          XXXXXXX,        KC_KP_7,    _______,
                                                                                                               XXXXXXX,        XXXXXXX,
                                                                                    XXXXXXX, _______,          _______,        _______, QK_BOOT, _______
 ),
@@ -225,69 +317,100 @@ void keyboard_post_init_user(void) {
 #endif
 };
 
-// Runs whenever there is a layer state change.
-layer_state_t layer_state_set_user(layer_state_t state) {
+bool process_detected_host_os_kb(os_variant_t detected_os) {
+    if (!process_detected_host_os_user(detected_os)) {
+        return false;
+    }
+    switch (detected_os) {
+        case OS_MACOS:
+        case OS_IOS:
+            layer_move(BASE_MAC);
+            break;
+        case OS_WINDOWS:
+            layer_move(BASE_WIN);
+            break;
+        case OS_LINUX:
+            layer_move(BASE_WIN);
+            break;
+        case OS_UNSURE:
+            layer_move(BASE_WIN);
+            break;
+    }
+
+    return true;
+}
+
+void layer_led_set(uint8_t layer) {
   ergodox_board_led_off();
   ergodox_right_led_1_off();
   ergodox_right_led_2_off();
-  ergodox_right_led_3_on();
+  ergodox_right_led_3_off();
 
-  uint8_t layer = get_highest_layer(state);
   switch (layer) {
       case 0:
+        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_0
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_0);
         #endif
         break;
       case 1:
-        ergodox_right_led_1_on();
+        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_1
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_1);
         #endif
         break;
       case 2:
-        ergodox_right_led_2_on();
+        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_2
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_2);
         #endif
         break;
       case 3:
+        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_3
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_3);
         #endif
         break;
       case 4:
-        ergodox_right_led_1_on();
         ergodox_right_led_2_on();
         #ifdef RGBLIGHT_COLOR_LAYER_4
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_4);
         #endif
         break;
       case 5:
-        ergodox_right_led_1_on();
-        ergodox_right_led_3_on();
+        ergodox_right_led_2_on();
         #ifdef RGBLIGHT_COLOR_LAYER_5
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_5);
         #endif
         break;
       case 6:
         ergodox_right_led_2_on();
-        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_6
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_6);
         #endif
         break;
       case 7:
-        ergodox_right_led_1_on();
         ergodox_right_led_2_on();
-        ergodox_right_led_3_on();
         #ifdef RGBLIGHT_COLOR_LAYER_7
           rgblight_setrgb(RGBLIGHT_COLOR_LAYER_7);
         #endif
         break;
       default:
         break;
-    }
+  }
+};
 
+// Runs whenever there is a layer state change.
+layer_state_t layer_state_set_user(layer_state_t state) {
+  uint8_t layer = get_highest_layer(state | default_layer_state);
+  layer_led_set(layer);
   return state;
 };
+
+/* // Runs whenever there is a default layer change.
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+  //uint8_t layer = biton32(state);
+  //uint8_t layer = get_highest_layer(state);
+  //layer_led_set(layer);
+  return state;
+}; */

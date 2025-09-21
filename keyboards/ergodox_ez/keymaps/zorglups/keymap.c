@@ -1,6 +1,6 @@
 /* TASKS
- * - Compile and test current layout
- * -
+* - Compile and test current layout
+* -
  * - WinCompose and Unicode https://docs.qmk.fm/#/feature_unicode?id=methods
  * - Modifiers on home row (lwin, lalt, lctrl, lshift - rshift, rctrl, ralt, rwin)
  *   https://precondition.github.io/home-row-mods
@@ -18,6 +18,7 @@
  *
  */
 
+#include "action.h"
 #include QMK_KEYBOARD_H
 #include "version.h"
 
@@ -25,6 +26,7 @@
 //#include "keymap_french_mac_iso.h"
 #include "keymap_french_mac_iso.h"
 #include "os_detection.h"
+#include "print.h"
 
 // Custom variables
 int alt_tab_count = 0;
@@ -66,6 +68,11 @@ enum layers {
 enum custom_keycodes {
     ALTTAB = SAFE_RANGE, // SAFE_RANGE is only needed on the first entry : https://github.com/qmk/qmk_firmware/blob/master/docs/custom_quantum_functions.md
     CMDTAB,
+    MACHOME,
+    MACEND,
+    MACDOT,
+    MACGRV,
+    MACTILDE,
     LBRACKET,
     RBRACKET,
     LPARENT,
@@ -81,7 +88,9 @@ enum custom_keycodes {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint16_t fnx_layer_timer;
-
+    if (record->event.pressed) {
+        //uprintf("keycode %u pressed\n", keycode);
+    }
     switch (keycode) {
       case FNX:
         if(record->event.pressed){
@@ -125,7 +134,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         } else {
             // when keycode QMKBEST is released
             if (alt_tab_count > 0) {
-              SEND_STRING(SS_UP(X_LALT));;
+              SEND_STRING(SS_UP(X_LALT));
             }
         }
         break;
@@ -137,13 +146,46 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           SEND_STRING(SS_UP(X_TAB));
         }
         break;
+      case MACHOME:
+        if (record->event.pressed) {
+            uint8_t mods = get_mods() | get_oneshot_mods();
+            uprintf("MACHOME pressed, mods: %02X\n", mods);
+            if (mods & MOD_LALT) { // or MOD_RALT if you use right Alt
+                uprintf("MACHOME sending cmd-up\n");
+                del_mods(MOD_MASK_ALT);         // clear Alt/Opt modifiers
+                tap_code16(G(KC_UP));           // send Cmd+Up
+                set_mods(mods);                 // restore previous modifiers
+                return false; // Prevent any other action
+            }
+            tap_code16(G(KC_LEFT));
+            return false; // Prevent any other action
+        }
+        break;
+      case MACEND:
+        if (record->event.pressed) {
+            uint8_t mods = get_mods() | get_oneshot_mods();
+            if (mods & MOD_LALT) { // or MOD_RALT if you use right Alt
+                del_mods(MOD_MASK_ALT);         // clear Alt/Opt modifiers
+                tap_code16(G(KC_DOWN)); // send Cmd+Down
+                set_mods(mods);                 // restore previous modifiers
+                return false; // Prevent any other action
+            }
+            tap_code16(G(KC_RIGHT));
+            return false; // Prevent any other action
+        }
+        break;
+      case MACDOT:
+        if (record->event.pressed) {
+            SEND_STRING(".");
+        }
+        break;
       case MO(NAVNUM_MAC):
         if (record->event.pressed) {
             // when keycode QMKBEST is pressed
         } else {
             // when keycode QMKBEST is released
             if (cmd_tab_count > 0) {
-              SEND_STRING(SS_UP(X_LCMD));;
+              SEND_STRING(SS_UP(X_LCMD));
             }
         }
         break;
@@ -189,7 +231,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
       case GRV:
         if (record->event.pressed) {
+            uprintf("GRV pressed\n");
             SEND_STRING("`");
+        }
+        break;
+      case MACGRV:
+        if (record->event.pressed) {
+            uprintf("MACGRV pressed\n");
+            tap_code(KC_BSLS);
+            tap_code(KC_SPC);
+        }
+        break;
+      case MACTILDE:
+        if (record->event.pressed) {
+            uprintf("MACTILDE pressed\n");
+            tap_code16(A(KC_N));
+            tap_code(KC_SPC);
         }
         break;
       case TILDE:
@@ -225,7 +282,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   LBRACKET,  KC_GRAVE,        KC_HOME, KC_UP,   KC_END,     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        BCKSLASH,         RBRACKET,
   LPARENT,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), GUI_T(KC_KP_DOT), RPARENT,
   LCBRACKET, ALTTAB,          CTL_X,   CTL_C,   CTL_V,      WIN_SHFT_RGHT, _______,        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,   RCBRACKET,
-  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
+  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        G(KC_COMM),       XXXXXXX,        XXXXXXX,          XXXXXXX,
                                                             QK_BOOT,         XXXXXXX,        KC_KP_1,   XXXXXXX,
                                                                              XXXXXXX,        XXXXXXX,
                                                      _M_M_M_, DF(BASE_MAC),       XXXXXXX,        XXXXXXX, XXXXXXX, _______
@@ -248,7 +305,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______,           BE_PIPE,           BE_AT,           BE_HASH,          GRV,             TILDE,            XXXXXXX,        XXXXXXX, XXXXXXX,        KC_F10,         KC_F11,         KC_F12,         XXXXXXX,          XXXXXXX,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         BE_EURO,          XXXXXXX,         XXXXXXX,          _______,        _______, KC_PSCR,        KC_F7,          KC_F8,          KC_F9,          XXXXXXX,          XXXXXXX,
   _______,           KC_LGUI,           KC_LALT,         KC_LCTL,          KC_LSFT,         XXXXXXX,                                   KC_INSERT,      KC_F4,          KC_F5,          KC_F6,          XXXXXXX,          _______,
-  BE_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          XXXXXXX,          XXXXXXX,
+  BE_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          TILDE,          GRV,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,                                                                    _M_M_M_,        XXXXXXX,        XXXXXXX,        XXXXXXX,          XXXXXXX,
                                                                                             QK_BOOT,          XXXXXXX,        KC_KP_3,    _______,
                                                                                                               XXXXXXX,        XXXXXXX,
@@ -264,7 +321,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // left hand
   KC_ESCAPE,       KC_1,        KC_2,          KC_3,        KC_4,        KC_5,      KC_QUOTE,             KC_RBRC,      KC_6,    KC_7,        KC_8,        KC_9,        KC_0,             KC_MINS,
   KC_LBRC,         KC_Q,        KC_W,          KC_E,        KC_R,        KC_T,      KC_TAB,               KC_BSPC,      KC_Y,    KC_U,        KC_I,        KC_O,        KC_P,             KC_EQUAL,
-  KC_ENTER,        CTL_T(KC_A), ALT_T(KC_S),   CMD_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CMD_T(KC_K), ALT_T(KC_L), CTL_T(KC_SCLN),   KC_ENTER,
+  KC_ENTER,        CTL_T(KC_A), ALT_T(KC_S),   CMD_T(KC_D), SFT_T(KC_F), KC_G,                                KC_H,    SFT_T(KC_J), CMD_T(KC_K), ALT_T(KC_L), CTL_T(KC_SCLN),   KC_ENTER,
   KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
   XXXXXXX,         XXXXXXX,     KC_LCTL,       KC_LOPT,     KC_LCMD,                                                                  MO(ALTGRFN_MAC),        XXXXXXX,XXXXXXX,  XXXXXXX,       XXXXXXX,
                                                                          XXXXXXX,   XXXXXXX,              KC_KP_4,         XXXXXXX,
@@ -275,10 +332,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [NAVNUM_MAC] = LAYOUT_ergodox_pretty(
   // left hand
   _______,   KC_F1,           KC_F2,   KC_F3,   KC_F4,      KC_F5,         KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           QK_BOOT,
-  FR_LBRC,   MACCY,           G(KC_LEFT), KC_UP,   G(KC_RIGHT),     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        BCKSLASH,         FR_RBRC,
-  FR_LPRN,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                     KC_KP_MINUS,SFT_T(KC_KP_4), CMD_T(KC_KP_5), OPT_T(KC_KP_6), CTL_T(KC_KP_DOT), FR_RPRN,
-  FR_LCBR,   CMDTAB,          CMD_X,   CMD_C,   CMD_V,      C(A(KC_K)),    C(A(KC_X)),        _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,    FR_RCBR,
-  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        KC_RCTL,       XXXXXXX,        XXXXXXX,          XXXXXXX,
+  FR_LBRC,   MACCY,           MACHOME, KC_UP,   MACEND,     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        S(A(KC_DOT)),         FR_RBRC,
+  FR_LPRN,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                     KC_KP_MINUS,SFT_T(KC_KP_4), OPT_T(KC_KP_5), CMD_T(KC_KP_6), MACDOT, FR_RPRN,
+  FR_LCBR,   CMDTAB,          CMD_X,   CMD_C,   CMD_V,      C(A(KC_K)),    C(A(KC_X)),        _______, KC_KP_DOT,          KC_KP_1,        KC_KP_2,        KC_KP_3,        C(KC_ENTER),    FR_RCBR,
+  XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        C(G(KC_SPC)),       XXXXXXX,        XXXXXXX,          XXXXXXX,
                                                             QK_BOOT,         XXXXXXX,        KC_KP_5,    XXXXXXX,
                                                                              XXXXXXX,        XXXXXXX,
                                                      _M_M_M_, DF(BASE_WIN),       XXXXXXX,        XXXXXXX, XXXXXXX, _______
@@ -298,10 +355,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 7: AltGrFn Mac Layer */
 [ALTGRFN_MAC] = LAYOUT_ergodox_pretty(
   // left hand
-  _______,           FR_PIPE,           FR_AT,           FR_HASH,          XXXXXXX,         XXXXXXX,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_F10,         KC_F11,         KC_F12,         XXXXXXX,          XXXXXXX,
-  XXXXXXX,           XXXXXXX,           XXXXXXX,         BE_EURO,          XXXXXXX,         XXXXXXX,          _______,        _______, KC_PSCR,        KC_F7,          KC_F8,          KC_F9,          XXXXXXX,          XXXXXXX,
+  _______,           FR_PIPE,           FR_AT,           FR_HASH,          MACGRV,         MACTILDE,          XXXXXXX,        XXXXXXX, XXXXXXX,        KC_F10,         KC_F11,         KC_F12,         XXXXXXX,          XXXXXXX,
+  XXXXXXX,           XXXXXXX,           XXXXXXX,         A(KC_RBRC),          XXXXXXX,         XXXXXXX,          _______,        _______, KC_PSCR,        KC_F7,          KC_F8,          KC_F9,          XXXXXXX,          XXXXXXX,
   _______,           KC_LCTL,           KC_LALT,         KC_LCMD,          KC_LSFT,         XXXXXXX,                                           KC_INSERT,      KC_F4,          KC_F5,      KC_F6,      XXXXXXX,          _______,
-  FR_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          XXXXXXX,          XXXXXXX,
+  FR_BSLS,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,         XXXXXXX,          _______,        _______, XXXXXXX,        KC_F1,          KC_F2,          KC_F3,          MACTILDE,          MACGRV,
   XXXXXXX,           XXXXXXX,           XXXXXXX,         XXXXXXX,          XXXXXXX,                                                                                    _M_M_M_,        XXXXXXX,    XXXXXXX,    XXXXXXX,      XXXXXXX,
                                                                                             QK_BOOT,          XXXXXXX,        KC_KP_7,    _______,
                                                                                                               XXXXXXX,        XXXXXXX,
@@ -405,7 +462,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
   uint8_t layer = get_highest_layer(state | default_layer_state);
   layer_led_set(layer);
   return state;
-};
+}
 
 /* // Runs whenever there is a default layer change.
 layer_state_t default_layer_state_set_user(layer_state_t state) {
@@ -413,4 +470,4 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
   //uint8_t layer = get_highest_layer(state);
   //layer_led_set(layer);
   return state;
-}; */
+} */

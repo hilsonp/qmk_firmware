@@ -19,6 +19,7 @@
  */
 
 #include "action.h"
+#include "keycodes.h"
 #include QMK_KEYBOARD_H
 #include "version.h"
 
@@ -271,7 +272,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_ENTER,        GUI_T(KC_A), ALT_T(KC_S),   CTL_T(KC_D), SFT_T(KC_F), KC_G,                                          KC_H,    SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), GUI_T(KC_SCLN),   KC_ENTER,
   KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
   XXXXXXX,         XXXXXXX,     KC_LWIN,       KC_LALT,     KC_LCTL,                                                             MO(ALTGRFN_WIN), XXXXXXX, KC_RWIN,     XXXXXXX,          XXXXXXX,
-                                                                         XXXXXXX,   XXXXXXX,              KC_KP_0,         XXXXXXX,
+                                                                         KC_PRINT_SCREEN,   XXXXXXX,              KC_KP_0,         XXXXXXX,
                                                                                     XXXXXXX,              XXXXXXX,
                                                                MO(NAVNUM_WIN), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
 ),
@@ -324,7 +325,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_ENTER,        CTL_T(KC_A), ALT_T(KC_S),   CMD_T(KC_D), SFT_T(KC_F), KC_G,                                KC_H,    SFT_T(KC_J), CMD_T(KC_K), ALT_T(KC_L), CTL_T(KC_SCLN),   KC_ENTER,
   KC_NUBS,         KC_Z,        KC_X,          KC_C,        KC_V,        KC_B,      KC_DELETE,            KC_DELETE,    KC_N,    KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,          KC_QUOTE,
   XXXXXXX,         XXXXXXX,     KC_LCTL,       KC_LOPT,     KC_LCMD,                                                                  MO(ALTGRFN_MAC),        XXXXXXX,XXXXXXX,  XXXXXXX,       XXXXXXX,
-                                                                         XXXXXXX,   XXXXXXX,              KC_KP_4,         XXXXXXX,
+                                                                         G(KC_F4),   G(KC_F5),              KC_KP_4,         XXXXXXX,
                                                                                     XXXXXXX,              XXXXXXX,
                                                                MO(NAVNUM_MAC), KC_LSFT, XXXXXXX,              XXXXXXX,      KC_RSFT,    KC_SPC
 ),

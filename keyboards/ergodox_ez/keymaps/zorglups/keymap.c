@@ -333,9 +333,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [NAVNUM_MAC] = LAYOUT_ergodox_pretty(
   // left hand
   _______,   KC_F1,           KC_F2,   KC_F3,   KC_F4,      KC_F5,         KC_F11,         KC_F12,  KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,           QK_BOOT,
-  FR_LBRC,   MACCY,           MACHOME, KC_UP,   MACEND,     KC_PGUP,       _______,        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        S(A(KC_DOT)),         FR_RBRC,
+  FR_LBRC,   MACCY,           MACHOME, KC_UP,   MACEND,     KC_PGUP,       G(C(A(KC_LEFT))),        _______, KC_KP_SLASH,    KC_KP_7,        KC_KP_8,        KC_KP_9,        S(A(KC_DOT)),         FR_RBRC,
   FR_LPRN,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                     KC_KP_MINUS,SFT_T(KC_KP_4), OPT_T(KC_KP_5), CMD_T(KC_KP_6), MACDOT, FR_RPRN,
-  FR_LCBR,   CMDTAB,          CMD_X,   CMD_C,   CMD_V,      C(A(KC_K)),    C(A(KC_X)),        _______, KC_KP_DOT,          KC_KP_1,        KC_KP_2,        KC_KP_3,        C(KC_ENTER),    FR_RCBR,
+  FR_LCBR,   CMDTAB,          CMD_X,   CMD_C,   CMD_V,      S(G(C(A(KC_RIGHT)))),    G(C(A(KC_RIGHT))),        _______, KC_KP_DOT,          KC_KP_1,        KC_KP_2,        KC_KP_3,        C(KC_ENTER),    FR_RCBR,
   XXXXXXX,   XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX,                                                            KC_KP_0,        C(G(KC_SPC)),       XXXXXXX,        XXXXXXX,          XXXXXXX,
                                                             QK_BOOT,         XXXXXXX,        KC_KP_5,    XXXXXXX,
                                                                              XXXXXXX,        XXXXXXX,

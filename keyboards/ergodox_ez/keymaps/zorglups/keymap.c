@@ -57,7 +57,7 @@ enum layers {
 #define WIN_RGHT LGUI(KC_RIGHT)
 #define WIN_LEFT LGUI(KC_LEFT)
 #define WIN_SHFT_RGHT LGUI(LSFT(KC_RIGHT))
-#define WIN_UP LGUI(KC_UP)
+#define WIN_MAX LGUI(KC_SCLN)
 // https://github.com/qmk/qmk_firmware/blob/master/quantum/keymap_extras/keymap_french_mac_iso.h
 #define MAC_FR_AT KC_GRV
 #define MAC_FR_HASH LSFT(MAC_FR_AT)
@@ -350,7 +350,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   LPARENT,   SFT_T(KC_ENTER), KC_LEFT, KC_DOWN, KC_RIGHT,   KC_PGDN,                                        KC_KP_MINUS,    SFT_T(KC_KP_4), CTL_T(KC_KP_5), ALT_T(KC_KP_6), GUI_T(KC_KP_DOT), RPARENT,
   LCBRACKET, ALTTAB,          CTL_X,   CTL_C,   CTL_V,      WIN_SHFT_RGHT, WIN_RGHT,       _______, COLON,          KC_KP_1,        KC_KP_2,        KC_KP_3,        KC_APPLICATION,   RCBRACKET,
   XXXXXXX,   XXXXXXX,         KC_LWIN, KC_LALT, KC_LCTL,                                                            KC_KP_0,        G(KC_COMM),       XXXXXXX,        XXXXXXX,          XXXXXXX,
-                                                            WIN_UP,         QK_BOOT,        KC_KP_1,   XXXXXXX,
+                                                            WIN_MAX,         QK_BOOT,        KC_KP_1,   XXXXXXX,
                                                                                  XXXXXXX,        XXXXXXX,
                                              _M_M_M_, DF(BASE_MAC),      XXXXXXX,        XXXXXXX,   XXXXXXX, _______
 ),
